@@ -17,10 +17,12 @@ while true; do
 
     echo "Main Menu:"
     echo "1. Create New Database"
-    read -p "Choose an option (1): " choice
+    echo "2. Exit Program"
+    read -p "Choose an option (1-2): " choice
 
     case $choice in
         1) create_database ;;
+        2) echo "Exiting program..."; exit 0 ;;
         *) echo "Invalid option, please try again." ;;
     esac
 
