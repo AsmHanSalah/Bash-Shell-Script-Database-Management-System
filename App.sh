@@ -196,6 +196,20 @@ insert_into_table() {
 
 }
 
+select_from_table() {
+
+    read -p "Enter table name: " table_name
+    
+    if [ ! -f "$table_name" ]; then
+        echo "Table '$table_name' does not exist."
+        return
+    fi
+
+    echo "Contents of table '$table_name':"
+    cat "$table_name"
+
+}
+
 database_menu() {
 
     while true; do
@@ -214,7 +228,7 @@ database_menu() {
             2) list_tables ;;
             3) drop_table ;;
             4) insert_into_table ;;
-            5) echo "Function not implemented yet." ;;
+            5) select_from_table ;;
             6) echo "Disconnecting from database..."; cd ..; break ;;
             *) echo "Invalid option, please try again." ;;
         esac
