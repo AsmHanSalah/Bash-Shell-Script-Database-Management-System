@@ -102,6 +102,13 @@ create_table() {
 
 }
 
+list_tables() {
+
+    echo "Available tables:"
+    ls *.meta | sed 's/.meta$//'
+
+}
+
 database_menu() {
 
     while true; do
@@ -114,7 +121,7 @@ database_menu() {
 
         case $db_choice in
             1) create_table ;;
-            2) echo "Function not implemented yet." ;;
+            2) list_tables ;;
             3) echo "Disconnecting from database..."; cd ..; break ;;
             *) echo "Invalid option, please try again." ;;
         esac
