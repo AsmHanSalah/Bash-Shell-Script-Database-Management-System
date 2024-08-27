@@ -38,6 +38,19 @@ connect_to_database() {
 
 }
 
+drop_database() {
+ 
+    read -p "Enter database name to drop: " db_name
+ 
+    if [ -d "$db_name" ]; then
+        rm -r "$db_name"
+        echo "Database '$db_name' dropped successfully."
+    else
+        echo "Database '$db_name' does not exist."
+    fi
+
+}
+
 database_menu() {
 
     while true; do
@@ -71,7 +84,7 @@ while true; do
         1) create_database ;;
         2) list_databases ;;
         3) connect_to_database ;;
-        4) echo "Function not implemented yet." ;;
+        4) drop_database ;;
         5) echo "Exiting program..."; exit 0 ;;
         *) echo "Invalid option, please try again." ;;
     esac
