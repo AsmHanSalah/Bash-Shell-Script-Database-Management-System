@@ -210,6 +210,62 @@ select_from_table() {
 
 }
 
+delete_from_table() {
+
+    read -p "Enter table name: " table_name
+    
+    if [ ! -f "$table_name" ]; then
+        echo "Table '$table_name' does not exist."
+        return
+    fi
+
+    read -p "Enter condition (e.g., column=value) for deletion: " condition
+    
+    column=$(echo "$condition" | cut -d= -f1)
+    value=$(echo "$condition" | cut -d= -f2)
+
+    # Find the column index using the metadata file
+    columns=$(grep -v "PRIMARY_KEY" "$table_name.meta")
+    IFS=',' read -r -a column_array <<< "$columns"
+    column_index=-1
+    
+    for i in "${!column_array[@]}"; do
+        
+        col_name=$(echo "${column_array[$i]}" | cut -d: -f1)
+        if [[ "$col_name" == "$column" ]]; then
+            column_index=$((i + 1))
+            break
+        fi
+
+    done
+
+    if [[ $column_index -eq -1 ]]; then
+        echo "Column '$column' does not exist."
+        return
+    fi
+
+    # Perform the deletion based on the condition
+    match_found=false
+    awk -F, -v col="$column_index" -v val="$value" '
+    {
+        if ($col != val) {
+            print $0
+        } else {
+            match_found = 1
+        }
+    } END { if (match_found == 0) print "No matching rows found." }' "$table_name" > tmp
+
+    mv tmp "$table_name"
+
+    if ! grep -q "No matching rows found." "$table_name"; then
+        echo "Rows matching '$condition' deleted from '$table_name'."
+    else
+        echo "No matching rows found."
+        sed -i '/No matching rows found./d' "$table_name"  # Remove the message from the file if no match
+    fi
+
+}
+
 database_menu() {
 
     while true; do
@@ -230,7 +286,7 @@ database_menu() {
             3) drop_table ;;
             4) insert_into_table ;;
             5) select_from_table ;;
-            6) echo "Function not implemented yet." ;;
+            6) delete_from_table ;;
             7) echo "Disconnecting from database..."; cd ..; break ;;
             *) echo "Invalid option, please try again." ;;
         esac
