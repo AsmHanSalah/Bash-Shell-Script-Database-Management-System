@@ -13,6 +13,13 @@ create_database() {
 
 }
 
+list_databases() {
+
+    echo "All available databases:"
+    ls -d */
+
+}
+
 while true; do
 
     echo "Main Menu:"
@@ -23,7 +30,7 @@ while true; do
 
     case $choice in
         1) create_database ;;
-        2) echo "Function not implemented yet." ;;
+        2) list_databases ;;
         3) echo "Exiting program..."; exit 0 ;;
         *) echo "Invalid option, please try again." ;;
     esac
