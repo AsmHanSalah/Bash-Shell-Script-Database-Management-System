@@ -220,8 +220,9 @@ database_menu() {
         echo "3. Drop Table"
         echo "4. Insert into Table"
         echo "5. Select From Table"
-        echo "6. Disconnect (Return to Main Menu)"
-        read -p "Choose an option (1-6): " db_choice
+        echo "6. Delete From Table"
+        echo "7. Disconnect (Return to Main Menu)"
+        read -p "Choose an option (1-7): " db_choice
 
         case $db_choice in
             1) create_table ;;
@@ -229,7 +230,8 @@ database_menu() {
             3) drop_table ;;
             4) insert_into_table ;;
             5) select_from_table ;;
-            6) echo "Disconnecting from database..."; cd ..; break ;;
+            6) echo "Function not implemented yet." ;;
+            7) echo "Disconnecting from database..."; cd ..; break ;;
             *) echo "Invalid option, please try again." ;;
         esac
 
