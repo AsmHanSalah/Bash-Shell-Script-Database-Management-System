@@ -51,6 +51,57 @@ drop_database() {
 
 }
 
+create_table() {
+
+    read -p "Enter table name: " table_name
+    
+    if [ -f "$table_name" ]; then
+        echo "Table '$table_name' already exists."
+    else
+        valid_data_types=("int" "string" "boolean" "double")
+        
+        while true; do
+            
+            read -p "Enter columns (name:type) separated by commas: " columns
+            
+            columns_valid=true
+            IFS=',' read -r -a column_array <<< "$columns"
+            
+            for column_def in "${column_array[@]}"; do
+                column_type=$(echo "$column_def" | cut -d: -f2)
+                
+                if [[ ! " ${valid_data_types[@]} " =~ " $column_type " ]]; then
+                    echo "Invalid data type '$column_type'. Available types: int, string, boolean, double."
+                    columns_valid=false
+                    break
+                fi
+
+            done
+            
+            if $columns_valid; then
+                break
+            fi
+
+        done
+
+        read -p "Enter primary key column: " primary_key
+
+        # Validate primary key
+        if [[ ! "$columns" =~ $primary_key ]]; then
+            echo "Primary key must be one of the columns."
+            return
+        fi
+
+        # Save table schema
+        echo "$columns" > "$table_name.meta"
+        echo "PRIMARY_KEY=$primary_key" >> "$table_name.meta"
+        touch "$table_name"
+        echo "Table '$table_name' created with columns: '$columns'"
+    
+    fi
+
+}
+
 database_menu() {
 
     while true; do
@@ -61,7 +112,7 @@ database_menu() {
         read -p "Choose an option (1-2): " db_choice
 
         case $db_choice in
-            1) echo "Function not implemented yet." ;;
+            1) create_table ;;
             2) echo "Disconnecting from database..."; cd ..; break ;;
             *) echo "Invalid option, please try again." ;;
         esac
