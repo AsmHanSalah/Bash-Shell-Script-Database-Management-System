@@ -31,10 +31,29 @@ connect_to_database() {
         echo "Connected to database '$db_name' successfully."
         cd "$db_name"
         current_db="$db_name"
-        echo "Database menu not implemented yet."
+        database_menu
     else
         echo "Database '$db_name' does not exist."
     fi
+
+}
+
+database_menu() {
+
+    while true; do
+
+        echo "Database Menu:"
+        echo "1. Disconnect (Return to Main Menu)"
+        read -p "Choose an option (1): " db_choice
+
+        case $db_choice in
+            1) echo "Disconnecting from database..."; cd ..; break ;;
+            *) echo "Invalid option, please try again." ;;
+        esac
+
+        echo
+        
+    done
 
 }
 
