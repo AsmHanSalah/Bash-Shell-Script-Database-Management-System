@@ -266,6 +266,89 @@ delete_from_table() {
 
 }
 
+update_from_table() {
+
+    read -p "Enter table name: " table_name
+    
+    if [ ! -f "$table_name" ]; then
+        echo "Table '$table_name' does not exist."
+        return
+    fi
+
+    read -p "Enter condition (e.g., column=value) for updating: " condition
+    read -p "Enter updates (e.g., column=new_value) separated by commas: " updates
+
+    # Extract column to update and value to set
+    IFS=',' read -r -a update_array <<< "$updates"
+    declare -A update_dict
+    
+    for update in "${update_array[@]}"; do
+        
+        col_name=$(echo "$update" | cut -d= -f1)
+        new_val=$(echo "$update" | cut -d= -f2)
+        update_dict[$col_name]=$new_val
+    
+    done
+
+    # Extract condition column and value
+    condition_column=$(echo "$condition" | cut -d= -f1)
+    condition_value=$(echo "$condition" | cut -d= -f2)
+
+    # Find the column index using the metadata file
+    columns=$(grep -v "PRIMARY_KEY" "$table_name.meta")
+    IFS=',' read -r -a column_array <<< "$columns"
+    condition_index=-1
+    update_indices=()
+    update_values=()
+    
+    for i in "${!column_array[@]}"; do
+        
+        col_name=$(echo "${column_array[$i]}" | cut -d: -f1)
+        if [[ "$col_name" == "$condition_column" ]]; then
+            condition_index=$((i + 1))
+        fi
+        
+        if [[ ${update_dict[$col_name]+_} ]]; then
+            update_indices+=("$((i + 1))")
+            update_values+=("${update_dict[$col_name]}")
+        fi
+
+    done
+
+    if [[ $condition_index -eq -1 ]]; then
+        echo "Condition column $condition_column does not exist."
+        return
+    fi
+
+    # Perform the update using a loop to handle each update
+    match_found=false
+    awk -F, -v OFS=, -v cond_col="$condition_index" -v cond_val="$condition_value" \
+        -v update_cols="${update_indices[*]}" -v update_vals="${update_values[*]}" '
+    BEGIN {
+        split(update_cols, cols, " ")
+        split(update_vals, vals, " ")
+    }
+    {
+        if ($cond_col == cond_val) {
+            match_found = 1
+            for (i in cols) {
+                $cols[i] = vals[i]
+            }
+        }
+        print $0
+    } END { if (match_found == 0) print "No matching rows found." }' "$table_name" > tmp
+
+    mv tmp "$table_name"
+
+    if ! grep -q "No matching rows found." "$table_name"; then
+        echo "Rows matching '$condition' updated in '$table_name'."
+    else
+        echo "No matching rows found."
+        sed -i '/No matching rows found./d' "$table_name"  # Remove the message from the file if no match
+    fi
+
+}
+
 database_menu() {
 
     while true; do
@@ -288,7 +371,7 @@ database_menu() {
             4) insert_into_table ;;
             5) select_from_table ;;
             6) delete_from_table ;;
-            7) echo "Function not implemented yet." ;;
+            7) update_from_table ;;
             8) echo "Disconnecting from database..."; cd ..; break ;;
             *) echo "Invalid option, please try again." ;;
         esac
