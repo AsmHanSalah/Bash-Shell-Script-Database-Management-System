@@ -105,7 +105,7 @@ create_table() {
 list_tables() {
 
     echo "Available tables:"
-    ls *.meta | sed 's/.meta$//'
+    ls *.meta 2>/dev/null | sed 's/.meta$//' || echo "No tables found."
 
 }
 
