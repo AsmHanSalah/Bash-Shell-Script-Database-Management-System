@@ -25,13 +25,15 @@ while true; do
     echo "Main Menu:"
     echo "1. Create New Database"
     echo "2. List All Databases"
-    echo "3. Exit Program"
-    read -p "Choose an option (1-3): " choice
+    echo "3. Connect to Database"
+    echo "4. Exit Program"
+    read -p "Choose an option (1-4): " choice
 
     case $choice in
         1) create_database ;;
         2) list_databases ;;
-        3) echo "Exiting program..."; exit 0 ;;
+        3) echo "Function not implemented yet." ;;
+        4) echo "Exiting program..."; exit 0 ;;
         *) echo "Invalid option, please try again." ;;
     esac
 
