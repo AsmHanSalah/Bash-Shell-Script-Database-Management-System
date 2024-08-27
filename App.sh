@@ -56,11 +56,13 @@ database_menu() {
     while true; do
 
         echo "Database Menu:"
-        echo "1. Disconnect (Return to Main Menu)"
-        read -p "Choose an option (1): " db_choice
+        echo "1. Create Table"
+        echo "2. Disconnect (Return to Main Menu)"
+        read -p "Choose an option (1-2): " db_choice
 
         case $db_choice in
-            1) echo "Disconnecting from database..."; cd ..; break ;;
+            1) echo "Function not implemented yet." ;;
+            2) echo "Disconnecting from database..."; cd ..; break ;;
             *) echo "Invalid option, please try again." ;;
         esac
 
