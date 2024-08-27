@@ -122,6 +122,80 @@ drop_table() {
 
 }
 
+insert_into_table() {
+    
+    read -p "Enter table name: " table_name
+    
+    if [ ! -f "$table_name" ]; then
+        echo "Table $table_name does not exist."
+        return
+    fi
+
+    # Correctly construct the path to the .meta file
+    meta_file="$table_name.meta"
+    if [ ! -f "$meta_file" ]; then
+        echo "Metadata file for table $table_name does not exist."
+        return
+    fi
+
+    # Load table schema without using source
+    columns=$(grep -v "PRIMARY_KEY" "$meta_file")
+    primary_key=$(grep "PRIMARY_KEY" "$meta_file" | cut -d'=' -f2)
+    IFS=',' read -r -a column_array <<< "$columns"
+    primary_key_index=-1
+
+    # Prepare to insert
+    row=""
+    for i in "${!column_array[@]}"; do
+
+        column_name=$(echo "${column_array[$i]}" | cut -d: -f1)
+        column_type=$(echo "${column_array[$i]}" | cut -d: -f2)
+
+        if [[ "$column_name" == "$primary_key" ]]; then
+            primary_key_index=$i
+        fi
+
+        while true; do
+
+            read -p "Enter value for $column_name ($column_type): " value
+            
+            # Validate data type
+            if [[ "$column_type" == "int" && ! "$value" =~ ^[0-9]+$ ]]; then
+                echo "Invalid input, expected integer for $column_name."
+            elif [[ "$column_type" == "string" && "$value" =~ [^a-zA-Z] ]]; then
+                echo "Invalid input, expected string for $column_name."
+            elif [[ "$column_type" == "boolean" && ! "$value" =~ ^(true|false)$ ]]; then
+                echo "Invalid input, expected boolean (true/false) for $column_name."
+            elif [[ "$column_type" == "double" && ! "$value" =~ ^-?[0-9]*\.[0-9]+$ ]]; then
+                echo "Invalid input, expected double (floating-point number) for $column_name."
+            else
+                break
+            fi
+
+        done
+
+        row="$row$value,"
+
+    done
+
+    row=${row%,}
+
+    # Check primary key uniqueness
+    if [[ $primary_key_index -ne -1 ]]; then
+
+        primary_key_value=$(echo "$row" | cut -d, -f$((primary_key_index + 1)))
+        if grep -q "^$primary_key_value," "$table_name"; then
+            echo "Primary key value $primary_key_value already exists."
+            return
+        fi
+
+    fi
+
+    echo "$row" >> "$table_name"
+    echo "Row inserted into '$table_name' successfully."
+
+}
+
 database_menu() {
 
     while true; do
@@ -138,7 +212,7 @@ database_menu() {
             1) create_table ;;
             2) list_tables ;;
             3) drop_table ;;
-            4) echo "Function not implemented yet." ;;
+            4) insert_into_table ;;
             5) echo "Disconnecting from database..."; cd ..; break ;;
             *) echo "Invalid option, please try again." ;;
         esac
