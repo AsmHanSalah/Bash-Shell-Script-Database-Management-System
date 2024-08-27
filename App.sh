@@ -16,7 +16,7 @@ create_database() {
 list_databases() {
 
     echo "All available databases:"
-    ls -d */
+    ls -d */ 2>/dev/null || echo "No databases found."
 
 }
 
