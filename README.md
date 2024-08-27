@@ -1,5 +1,9 @@
 # Bash Shell Script Database Management System (DBMS)
 
+<p align="center">
+  <img src="assets/banner.webp" alt="Bash DBMS Banner">
+</p>
+
 ## Overview
 
 This project implements a simple Database Management System (DBMS) using Bash scripting. The system allows users to perform basic database operations, such as creating databases and tables, inserting, selecting, updating, and deleting records, through a Command-Line Interface (CLI). Each database is represented as a directory, and each table is represented as a file within its respective database directory.
