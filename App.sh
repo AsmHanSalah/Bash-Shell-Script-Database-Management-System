@@ -109,6 +109,19 @@ list_tables() {
 
 }
 
+drop_table() {
+
+    read -p "Enter table name to drop: " table_name
+    
+    if [ -f "$table_name" ]; then
+        rm "$table_name" "$table_name.meta"
+        echo "Table '$table_name' dropped successfully."
+    else
+        echo "Table '$table_name' does not exist."
+    fi
+
+}
+
 database_menu() {
 
     while true; do
@@ -123,7 +136,7 @@ database_menu() {
         case $db_choice in
             1) create_table ;;
             2) list_tables ;;
-            3) echo "Function not implemented yet." ;;
+            3) drop_table ;;
             4) echo "Disconnecting from database..."; cd ..; break ;;
             *) echo "Invalid option, please try again." ;;
         esac
