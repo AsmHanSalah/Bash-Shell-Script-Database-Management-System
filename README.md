@@ -1,7 +1,7 @@
 # Bash Shell Script Database Management System (DBMS)
 
 <p align="center">
-  <img src="assets/banner.webp" alt="Bash DBMS Banner">
+  <img src="banner.webp" alt="Bash DBMS Banner">
 </p>
 
 ## Overview
